@@ -301,3 +301,84 @@ int vdef_frame_info_to_json(const struct vdef_frame_info *info,
 
 	return 0;
 }
+
+
+int vdef_raw_format_to_json(const struct vdef_raw_format *format,
+			    struct json_object *jobj)
+{
+	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(jobj == NULL, EINVAL);
+
+	/* Pixel format */
+	json_object_object_add(
+		jobj,
+		"pix_format",
+		json_object_new_string(
+			vdef_raw_pix_format_to_str(format->pix_format)));
+
+	/* Pixel order */
+	json_object_object_add(jobj,
+			       "pix_order",
+			       json_object_new_string(vdef_raw_pix_order_to_str(
+				       format->pix_order)));
+
+	/* Pixel layout */
+	json_object_object_add(
+		jobj,
+		"pix_layout",
+		json_object_new_string(
+			vdef_raw_pix_layout_to_str(format->pix_layout)));
+
+	/* Pixel value size in bits (excluding padding) */
+	json_object_object_add(
+		jobj, "pix_size", json_object_new_int(format->pix_size));
+
+	/* Data layout */
+	json_object_object_add(
+		jobj,
+		"data_layout",
+		json_object_new_string(
+			vdef_raw_data_layout_to_str(format->data_layout)));
+
+	/* Data padding: true is padding in lower bits,
+	 * false is padding in higher bits */
+	json_object_object_add(jobj,
+			       "data_pad_low",
+			       json_object_new_boolean(format->data_pad_low));
+
+	/* Data endianness: true is little-endian, false is big-endian */
+	json_object_object_add(
+		jobj,
+		"data_little_endian",
+		json_object_new_boolean(format->data_little_endian));
+
+	/* Data size in bits including padding */
+	json_object_object_add(
+		jobj, "data_size", json_object_new_int(format->data_size));
+
+	return 0;
+}
+
+
+VDEF_API
+int vdef_coded_format_to_json(const struct vdef_coded_format *format,
+			      struct json_object *jobj)
+{
+	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(jobj == NULL, EINVAL);
+
+	/* Video encoding */
+	json_object_object_add(
+		jobj,
+		"encoding",
+		json_object_new_string(vdef_encoding_to_str(format->encoding)));
+
+	/* Data format */
+	json_object_object_add(
+		jobj,
+		"data_format",
+		json_object_new_string(
+			vdef_coded_data_format_to_str(format->data_format)));
+
+	return 0;
+}

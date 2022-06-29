@@ -134,9 +134,10 @@ bool vdef_is_raw_format_valid(const struct vdef_raw_format *format)
 
 		break;
 	case VDEF_RAW_PIX_FORMAT_RGBA32:
-		/* Only reversed order allowed */
+		/* Only 3 orders allowed */
 		if (pix_order != VDEF_RAW_PIX_ORDER_RGBA &&
-		    pix_order != VDEF_RAW_PIX_ORDER_ABGR)
+		    pix_order != VDEF_RAW_PIX_ORDER_ABGR &&
+		    pix_order != VDEF_RAW_PIX_ORDER_BGRA)
 			return false;
 
 		/* Allow packed and planar */
@@ -316,6 +317,8 @@ enum vdef_frame_type vdef_frame_type_from_str(const char *str)
 		return VDEF_FRAME_TYPE_RAW;
 	} else if (strcasecmp(str, "CODED") == 0) {
 		return VDEF_FRAME_TYPE_CODED;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_FRAME_TYPE_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown frame type '%s'", __func__, str);
 		return VDEF_FRAME_TYPE_UNKNOWN;
@@ -542,6 +545,7 @@ static const struct {
 	{"bgr", &vdef_bgr},
 	/* RGBA32 formats */
 	{"rgba", &vdef_rgba},
+	{"bgra", &vdef_bgra},
 	{"abgr", &vdef_abgr},
 	/* Bayer formats */
 	{"bayer_rggb", &vdef_bayer_rggb},
@@ -856,6 +860,8 @@ enum vdef_encoding vdef_encoding_from_str(const char *str)
 	} else if ((strcasecmp(str, "H265") == 0) ||
 		   (strcasecmp(str, "HEVC") == 0)) {
 		return VDEF_ENCODING_H265;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_ENCODING_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown encoding '%s'", __func__, str);
 		return VDEF_ENCODING_UNKNOWN;
@@ -904,6 +910,8 @@ enum vdef_coded_data_format vdef_coded_data_format_from_str(const char *str)
 	} else if ((strcasecmp(str, "AVCC") == 0) ||
 		   (strcasecmp(str, "HVCC") == 0)) {
 		return VDEF_CODED_DATA_FORMAT_AVCC;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_CODED_DATA_FORMAT_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown coded format '%s'", __func__, str);
 		return VDEF_CODED_DATA_FORMAT_UNKNOWN;
@@ -938,6 +946,7 @@ static const struct {
 	{"h265_raw_nalu", &vdef_h265_raw_nalu},
 	{"h265_byte_stream", &vdef_h265_byte_stream},
 	{"h265_hvcc", &vdef_h265_hvcc},
+	{"jpeg_jfif", &vdef_jpeg_jfif},
 };
 
 
@@ -1025,6 +1034,8 @@ enum vdef_coded_frame_type vdef_coded_frame_type_from_str(const char *str)
 		return VDEF_CODED_FRAME_TYPE_P;
 	} else if (strcasecmp(str, "P_NON_REF") == 0) {
 		return VDEF_CODED_FRAME_TYPE_P_NON_REF;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_CODED_FRAME_TYPE_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown coded frame type '%s'", __func__, str);
 		return VDEF_CODED_FRAME_TYPE_UNKNOWN;
@@ -1159,6 +1170,8 @@ enum vdef_color_primaries vdef_color_primaries_from_str(const char *str)
 		return VDEF_COLOR_PRIMARIES_DCI_P3;
 	} else if (strcasecmp(str, "DISPLAY_P3") == 0) {
 		return VDEF_COLOR_PRIMARIES_DISPLAY_P3;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_COLOR_PRIMARIES_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown color primaries '%s'", __func__, str);
 		return VDEF_COLOR_PRIMARIES_UNKNOWN;
@@ -1401,6 +1414,8 @@ enum vdef_transfer_function vdef_transfer_function_from_str(const char *str)
 		return VDEF_TRANSFER_FUNCTION_HLG;
 	} else if (strcasecmp(str, "SRGB") == 0) {
 		return VDEF_TRANSFER_FUNCTION_SRGB;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_TRANSFER_FUNCTION_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown transfer function '%s'", __func__, str);
 		return VDEF_TRANSFER_FUNCTION_UNKNOWN;
@@ -1533,6 +1548,8 @@ enum vdef_matrix_coefs vdef_matrix_coefs_from_str(const char *str)
 		return VDEF_MATRIX_COEFS_BT2020_NON_CST;
 	} else if (strcasecmp(str, "BT2020_CST") == 0) {
 		return VDEF_MATRIX_COEFS_BT2020_CST;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_MATRIX_COEFS_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown matrix coefs '%s'", __func__, str);
 		return VDEF_MATRIX_COEFS_UNKNOWN;
@@ -1569,6 +1586,8 @@ enum vdef_dynamic_range vdef_dynamic_range_from_str(const char *str)
 		return VDEF_DYNAMIC_RANGE_HDR8;
 	} else if (strcasecmp(str, "HDR10") == 0) {
 		return VDEF_DYNAMIC_RANGE_HDR10;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_DYNAMIC_RANGE_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown dynamic range '%s'", __func__, str);
 		return VDEF_DYNAMIC_RANGE_UNKNOWN;
@@ -1597,6 +1616,8 @@ enum vdef_tone_mapping vdef_tone_mapping_from_str(const char *str)
 		return VDEF_TONE_MAPPING_STANDARD;
 	} else if (strcasecmp(str, "P_LOG") == 0) {
 		return VDEF_TONE_MAPPING_P_LOG;
+	} else if (strcasecmp(str, "UNKNOWN") == 0) {
+		return VDEF_TONE_MAPPING_UNKNOWN;
 	} else {
 		ULOGW("%s: unknown tone mapping '%s'", __func__, str);
 		return VDEF_TONE_MAPPING_UNKNOWN;
@@ -1725,4 +1746,246 @@ void vdef_frame_to_format_info(const struct vdef_frame_info *frame,
 		.resolution = frame->resolution,
 		.sar = frame->sar,
 	};
+}
+
+
+int vdef_raw_format_to_csv(const struct vdef_raw_format *format, char **str)
+{
+	int ret = 0;
+
+	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
+
+	char *fmt = vdef_raw_format_to_str(format);
+	if (fmt == NULL) {
+		ret = -EPROTO;
+		ULOG_ERRNO("vdef_raw_format_to_str", -ret);
+		goto out;
+	}
+
+	ret = asprintf(str, "format=%s", fmt);
+	if (ret < 0) {
+		ret = -ENOMEM;
+		ULOG_ERRNO("asprintf", -ret);
+		goto out;
+	}
+	ret = 0;
+
+out:
+	free(fmt);
+	return ret;
+}
+
+
+int vdef_raw_format_from_csv(const char *str, struct vdef_raw_format *format)
+{
+	char *str2, *param, *key, *val, *temp, *p;
+
+	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
+
+	str2 = strdup(str);
+	if (str2 == NULL) {
+		ULOG_ERRNO("strdup", ENOMEM);
+		return -ENOMEM;
+	}
+
+	param = strtok_r(str2, ";", &temp);
+	while (param) {
+		while (*param == ' ')
+			param++;
+		key = param;
+		val = NULL;
+		p = strchr(param, '=');
+		if (p) {
+			val = p + 1;
+			*p = '\0';
+		}
+
+		if (strcmp(key, "format") == 0)
+			vdef_raw_format_from_str(val, format);
+
+		param = strtok_r(NULL, ";", &temp);
+	}
+
+	free(str2);
+	return 0;
+}
+
+
+int vdef_coded_format_to_csv(const struct vdef_coded_format *format, char **str)
+{
+	int ret = 0;
+
+	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
+
+	char *fmt = vdef_coded_format_to_str(format);
+	if (fmt == NULL) {
+		ret = -EPROTO;
+		ULOG_ERRNO("vdef_coded_format_to_str", -ret);
+		goto out;
+	}
+
+	ret = asprintf(str, "format=%s", fmt);
+	if (ret < 0) {
+		ret = -ENOMEM;
+		ULOG_ERRNO("asprintf", -ret);
+		goto out;
+	}
+	ret = 0;
+
+out:
+	free(fmt);
+	return ret;
+}
+
+
+int vdef_coded_format_from_csv(const char *str,
+			       struct vdef_coded_format *format)
+{
+	char *str2, *param, *key, *val, *temp, *p;
+
+	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
+
+	str2 = strdup(str);
+	if (str2 == NULL) {
+		ULOG_ERRNO("strdup", ENOMEM);
+		return -ENOMEM;
+	}
+
+	param = strtok_r(str2, ";", &temp);
+	while (param) {
+		while (*param == ' ')
+			param++;
+		key = param;
+		val = NULL;
+		p = strchr(param, '=');
+		if (p) {
+			val = p + 1;
+			*p = '\0';
+		}
+
+		if (strcmp(key, "format") == 0)
+			vdef_coded_format_from_str(val, format);
+
+		param = strtok_r(NULL, ";", &temp);
+	}
+
+	free(str2);
+	return 0;
+}
+
+
+int vdef_format_info_to_csv(const struct vdef_format_info *info, char **str)
+{
+	int ret;
+
+	ULOG_ERRNO_RETURN_ERR_IF(info == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
+
+	ret = asprintf(str,
+		       "resolution=%ux%u"
+		       ";framerate=%u/%u"
+		       ";sar=%u:%u"
+		       ";bit_depth=%u"
+		       ";full_range=%u"
+		       ";color_primaries=%s"
+		       ";transfer_function=%s"
+		       ";matrix_coefs=%s"
+		       ";dynamic_range=%s"
+		       ";tone_mapping=%s",
+		       info->resolution.width,
+		       info->resolution.height,
+		       info->framerate.num,
+		       info->framerate.den,
+		       info->sar.width,
+		       info->sar.height,
+		       info->bit_depth,
+		       info->full_range,
+		       vdef_color_primaries_to_str(info->color_primaries),
+		       vdef_transfer_function_to_str(info->transfer_function),
+		       vdef_matrix_coefs_to_str(info->matrix_coefs),
+		       vdef_dynamic_range_to_str(info->dynamic_range),
+		       vdef_tone_mapping_to_str(info->tone_mapping));
+	if (ret < 0) {
+		ret = -ENOMEM;
+		ULOG_ERRNO("asprintf", -ret);
+		return ret;
+	}
+
+	return 0;
+}
+
+
+int vdef_format_info_from_csv(const char *str, struct vdef_format_info *info)
+{
+	char *str2, *param, *key, *val, *temp, *p;
+
+	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
+	ULOG_ERRNO_RETURN_ERR_IF(info == NULL, EINVAL);
+
+	str2 = strdup(str);
+	if (str2 == NULL) {
+		ULOG_ERRNO("strdup", ENOMEM);
+		return -ENOMEM;
+	}
+
+	param = strtok_r(str2, ";", &temp);
+	while (param) {
+		while (*param == ' ')
+			param++;
+		key = param;
+		val = NULL;
+		p = strchr(param, '=');
+		if (p) {
+			val = p + 1;
+			*p = '\0';
+		}
+		if (val == NULL) {
+			param = strtok_r(NULL, ";", &temp);
+			continue;
+		}
+
+		if (strcmp(key, "resolution") == 0) {
+			sscanf(val,
+			       "%ux%u",
+			       &info->resolution.width,
+			       &info->resolution.height);
+		} else if (strcmp(key, "framerate") == 0) {
+			sscanf(val,
+			       "%u/%u",
+			       &info->framerate.num,
+			       &info->framerate.den);
+		} else if (strcmp(key, "sar") == 0) {
+			sscanf(val,
+			       "%u:%u",
+			       &info->sar.width,
+			       &info->sar.height);
+		} else if (strcmp(key, "bit_depth") == 0) {
+			sscanf(val, "%u", &info->bit_depth);
+		} else if (strcmp(key, "full_range") == 0) {
+			unsigned int n;
+			sscanf(val, "%u", &n);
+			info->full_range = (n != 0);
+		} else if (strcmp(key, "color_primaries") == 0) {
+			info->color_primaries =
+				vdef_color_primaries_from_str(val);
+		} else if (strcmp(key, "transfer_function") == 0) {
+			info->transfer_function =
+				vdef_transfer_function_from_str(val);
+		} else if (strcmp(key, "matrix_coefs") == 0) {
+			info->matrix_coefs = vdef_matrix_coefs_from_str(val);
+		} else if (strcmp(key, "dynamic_range") == 0) {
+			info->dynamic_range = vdef_dynamic_range_from_str(val);
+		} else if (strcmp(key, "tone_mapping") == 0) {
+			info->tone_mapping = vdef_tone_mapping_from_str(val);
+		}
+
+		param = strtok_r(NULL, ";", &temp);
+	}
+
+	free(str2);
+	return 0;
 }

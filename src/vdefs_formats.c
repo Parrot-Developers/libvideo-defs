@@ -320,7 +320,15 @@ VDEF_MAKE_RAW_FORMAT(vdef_abgr,
 		     false,
 		     false,
 		     8);
-
+VDEF_MAKE_RAW_FORMAT(vdef_bgra,
+		     RGBA32,
+		     BGRA,
+		     LINEAR,
+		     8,
+		     PACKED,
+		     false,
+		     false,
+		     8);
 
 /* Bayer 8-bits */
 VDEF_MAKE_RAW_FORMAT(vdef_bayer_rggb,
@@ -668,3 +676,6 @@ VDEF_MAKE_CODED_FORMAT(vdef_h265_byte_stream, H265, BYTE_STREAM);
 
 
 VDEF_MAKE_CODED_FORMAT(vdef_h265_hvcc, H265, HVCC);
+
+
+VDEF_MAKE_CODED_FORMAT(vdef_jpeg_jfif, JPEG, JFIF);

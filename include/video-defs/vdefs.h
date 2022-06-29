@@ -79,6 +79,9 @@ struct json_object;
  * General definitions
  */
 
+#define VDEF_RAW_MIME_TYPE "video/raw"
+
+
 /* Frame type */
 enum vdef_frame_type {
 	/* Unknown frame type */
@@ -544,6 +547,7 @@ enum vdef_raw_pix_order {
 	VDEF_RAW_PIX_ORDER_CBAD,
 	VDEF_RAW_PIX_ORDER_CBA = VDEF_RAW_PIX_ORDER_CBAD,
 	VDEF_RAW_PIX_ORDER_BGR = VDEF_RAW_PIX_ORDER_CBAD,
+	VDEF_RAW_PIX_ORDER_BGRA = VDEF_RAW_PIX_ORDER_CBAD,
 	VDEF_RAW_PIX_ORDER_CBDA,
 	VDEF_RAW_PIX_ORDER_CDAB,
 	VDEF_RAW_PIX_ORDER_GBRG = VDEF_RAW_PIX_ORDER_CDAB,
@@ -683,6 +687,7 @@ extern VDEF_API const struct vdef_raw_format vdef_rgb;
 extern VDEF_API const struct vdef_raw_format vdef_bgr;
 /* RGBA32 formats */
 extern VDEF_API const struct vdef_raw_format vdef_rgba;
+extern VDEF_API const struct vdef_raw_format vdef_bgra;
 extern VDEF_API const struct vdef_raw_format vdef_abgr;
 /* Bayer formats */
 extern VDEF_API const struct vdef_raw_format vdef_bayer_rggb;
@@ -798,6 +803,7 @@ extern VDEF_API const struct vdef_coded_format vdef_h264_avcc;
 extern VDEF_API const struct vdef_coded_format vdef_h265_raw_nalu;
 extern VDEF_API const struct vdef_coded_format vdef_h265_byte_stream;
 extern VDEF_API const struct vdef_coded_format vdef_h265_hvcc;
+extern VDEF_API const struct vdef_coded_format vdef_jpeg_jfif;
 
 
 /* Coded frame type */
@@ -1665,6 +1671,105 @@ VDEF_API
 int vdef_frame_info_to_json(const struct vdef_frame_info *info,
 			    bool min,
 			    struct json_object *jobj);
+
+
+/**
+ * Write a raw format structure to a JSON object.
+ * The jobj JSON object must have been previously allocated.
+ * The ownership of the JSON object stays with the caller.
+ * @param format: pointer to an input raw format structure
+ * @param jobj: pointer to the JSON object to write to (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_raw_format_to_json(const struct vdef_raw_format *format,
+			    struct json_object *jobj);
+
+
+/**
+ * Write a coded format structure to a JSON object.
+ * The jobj JSON object must have been previously allocated.
+ * The ownership of the JSON object stays with the caller.
+ * @param format: pointer to an input coded format structure
+ * @param jobj: pointer to the JSON object to write to (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_coded_format_to_json(const struct vdef_coded_format *format,
+			      struct json_object *jobj);
+
+
+/**
+ * Write a raw format structure to a CSV string.
+ * The CSV separator is ';' to use for example as MIME type parameters.
+ * The string is allocated and the ownership is transferred to the caller.
+ * @param format: pointer to an input raw format structure
+ * @param str: pointer to the allocated string (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_raw_format_to_csv(const struct vdef_raw_format *format, char **str);
+
+
+/**
+ * Read a raw format structure from a CSV string.
+ * The CSV separator is ';' to use for example as MIME type parameters.
+ * @param str: pointer to an input string
+ * @param format: pointer to the raw format structure (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_raw_format_from_csv(const char *str, struct vdef_raw_format *format);
+
+
+/**
+ * Write a coded format structure to a CSV string.
+ * The CSV separator is ';' to use for example as MIME type parameters.
+ * The string is allocated and the ownership is transferred to the caller.
+ * @param format: pointer to an input coded format structure
+ * @param str: pointer to the allocated string (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_coded_format_to_csv(const struct vdef_coded_format *format,
+			     char **str);
+
+
+/**
+ * Read a coded format structure from a CSV string.
+ * The CSV separator is ';' to use for example as MIME type parameters.
+ * @param str: pointer to an input string
+ * @param format: pointer to the coded format structure (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_coded_format_from_csv(const char *str,
+			       struct vdef_coded_format *format);
+
+
+/**
+ * Write a format information structure to a CSV string.
+ * The CSV separator is ';' to use for example as MIME type parameters.
+ * All information is written except the MDCV and CLL information.
+ * The string is allocated and the ownership is transferred to the caller.
+ * @param info: pointer to an input format information structure
+ * @param str: pointer to the allocated string (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_format_info_to_csv(const struct vdef_format_info *info, char **str);
+
+
+/**
+ * Read a format information structure from a CSV string.
+ * The CSV separator is ';' to use for example as MIME type parameters.
+ * All information is filled except the MDCV and CLL information.
+ * @param str: pointer to an input string
+ * @param info: pointer to the format information structure (output)
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API
+int vdef_format_info_from_csv(const char *str, struct vdef_format_info *info);
 
 
 #ifdef __cplusplus

@@ -28,3 +28,22 @@ LOCAL_PRIVATE_LIBRARIES := \
 	libulog
 
 include $(BUILD_LIBRARY)
+
+
+ifdef TARGET_TEST
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := tst-libvideo-defs
+LOCAL_LIBRARIES := \
+	libcunit\
+	libulog \
+	libvideo-defs
+LOCAL_CFLAGS := -std=gnu11
+LOCAL_SRC_FILES := \
+	tests/vdefs_test.c \
+	tests/vdefs_test_csv.c
+
+include $(BUILD_EXECUTABLE)
+
+endif
