@@ -7,7 +7,7 @@ LOCAL_MODULE := libvideo-defs
 LOCAL_CATEGORY_PATH := libs
 LOCAL_DESCRIPTION := Video definitions library
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
-LOCAL_CFLAGS := -DVDEF_API_EXPORTS -fvisibility=hidden -std=gnu11
+LOCAL_CFLAGS := -DVDEF_API_EXPORTS -fvisibility=hidden -std=gnu11 -D_GNU_SOURCE
 LOCAL_SRC_FILES := \
 	src/vdefs.c \
 	src/vdefs_formats.c \

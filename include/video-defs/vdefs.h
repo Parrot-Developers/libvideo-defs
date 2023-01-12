@@ -838,6 +838,9 @@ struct vdef_nalu {
 	/* NAL unit size in bytes */
 	size_t size;
 
+	/* Importance of the NAL unit (low numbers are more important) */
+	uint32_t importance;
+
 	union {
 		/* H.264 NAL unit information */
 		struct {
