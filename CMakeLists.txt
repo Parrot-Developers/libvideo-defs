@@ -24,5 +24,5 @@ target_compile_definitions(video-defs PRIVATE "_GNU_SOURCE")
 
 
 find_package(json-c CONFIG REQUIRED)
-target_link_libraries(video-defs PRIVATE json-c::json-c json-c::json-c-static)
-target_link_libraries(video-defs PRIVATE ulog h264 h265 video-defs_compiler_flags)
+target_link_libraries(video-defs PUBLIC json-c::json-c json-c::json-c-static)
+target_link_libraries(video-defs PUBLIC ulog h264 h265 video-defs_compiler_flags)
