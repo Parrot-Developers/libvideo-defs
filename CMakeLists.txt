@@ -13,6 +13,9 @@ add_library(video-defs_compiler_flags INTERFACE)
 target_compile_features(video-defs_compiler_flags INTERFACE cxx_std_11)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+set_target_properties(video-defs PROPERTIES
+                    POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
+)
 
 target_include_directories(video-defs PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -24,5 +27,5 @@ target_compile_definitions(video-defs PRIVATE "_GNU_SOURCE")
 
 
 find_package(json-c CONFIG REQUIRED)
-target_link_libraries(video-defs PUBLIC json-c::json-c json-c::json-c-static)
+target_link_libraries(video-defs PUBLIC json-c::json-c)
 target_link_libraries(video-defs PUBLIC ulog h264 h265 video-defs_compiler_flags)
