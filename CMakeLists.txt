@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
 project(video-defs VERSION 1.0)
 
+# checks if set up rpath exists for install
+if(COMMAND set_up_rpath)
+    set_up_rpath()
+else()
+    message("Set up rpath not defined!")
+endif()
+
+
 set(LIB_SOURCES
         src/vdefs.c
         src/vdefs_formats.c
@@ -23,16 +31,22 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "_GNU_SOURCE")
 
 
 find_package(json-c CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC 
+
+target_link_libraries(${PROJECT_NAME} 
+                        PRIVATE 
                       json-c::json-c 
                       json-c::json-c-static
                       ulog 
+
+                        PUBLIC
                       h264 
                       h265 
+
                       )
 
 install(TARGETS ${PROJECT_NAME}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}
-)
+        EXPORT ${PROJECT_NAME}-targets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        )
