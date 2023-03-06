@@ -39,7 +39,6 @@ find_package(json-c CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} 
                         PRIVATE 
                       json-c::json-c 
-                      json-c::json-c-static
                       ulog 
 
                         PUBLIC
