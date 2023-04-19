@@ -511,11 +511,13 @@ static const struct {
 	{"raw14_packed", &vdef_raw14_packed},
 	{"raw14", &vdef_raw14},
 	{"raw16", &vdef_raw16},
+	{"raw16_be", &vdef_raw16_be},
 	{"raw32", &vdef_raw32},
+	{"raw32_be", &vdef_raw32_be},
 	/* GRAY formats */
 	{"gray", &vdef_gray},
 	{"gray16", &vdef_gray16},
-	/* YUV422 planar formats */
+	/* YUV420 planar formats */
 	{"i420", &vdef_i420},
 	{"i420_10_16le", &vdef_i420_10_16le},
 	{"i420_10_16be", &vdef_i420_10_16be},
@@ -539,6 +541,8 @@ static const struct {
 	{"nv21_10_16be", &vdef_nv21_10_16be},
 	{"nv21_10_16le_high", &vdef_nv21_10_16le_high},
 	{"nv21_10_16be_high", &vdef_nv21_10_16be_high},
+	/* YUV444 planar formats */
+	{"i444", &vdef_i444},
 	/* RGB24 formats */
 	{"rgb", &vdef_rgb},
 	{"bgr", &vdef_bgr},
@@ -723,6 +727,29 @@ vdef_get_raw_frame_plane_count(const struct vdef_raw_format *format)
 	}
 }
 
+unsigned int
+vdef_get_raw_frame_component_count(enum vdef_raw_pix_format pix_format)
+{
+	switch (pix_format) {
+	case VDEF_RAW_PIX_FORMAT_BAYER:
+	case VDEF_RAW_PIX_FORMAT_RAW:
+	case VDEF_RAW_PIX_FORMAT_GRAY:
+	case VDEF_RAW_PIX_FORMAT_DEPTH:
+	case VDEF_RAW_PIX_FORMAT_DEPTH_FLOAT:
+		return 1;
+	case VDEF_RAW_PIX_FORMAT_YUV420:
+	case VDEF_RAW_PIX_FORMAT_YUV422:
+	case VDEF_RAW_PIX_FORMAT_YUV444:
+	case VDEF_RAW_PIX_FORMAT_RGB24:
+		return 3;
+	case VDEF_RAW_PIX_FORMAT_RGBA32:
+		return 4;
+	default:
+		ULOGW("Unknown pix format");
+		return 0;
+	}
+}
+
 
 int vdef_calc_raw_frame_size(const struct vdef_raw_format *format,
 			     const struct vdef_dim *resolution,
@@ -738,6 +765,7 @@ int vdef_calc_raw_frame_size(const struct vdef_raw_format *format,
 	unsigned char height_mul[VDEF_RAW_MAX_PLANE_COUNT] = {1, 1, 1, 1};
 	unsigned char height_div[VDEF_RAW_MAX_PLANE_COUNT] = {1, 1, 1, 1};
 	unsigned int plane_count;
+	unsigned int component_count;
 
 	if (!format || !resolution)
 		return -EINVAL;
@@ -747,25 +775,19 @@ int vdef_calc_raw_frame_size(const struct vdef_raw_format *format,
 
 	/* Get plane count */
 	plane_count = vdef_get_raw_frame_plane_count(format);
+	component_count =
+		vdef_get_raw_frame_component_count(format->pix_format);
 
 	/* Set plane multiplier / divisor */
-	if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV420 &&
-	    format->data_layout == VDEF_RAW_DATA_LAYOUT_PLANAR_Y_U_V) {
-		stride_div[1] = stride_div[2] = 2;
+	if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV420) {
 		height_div[1] = height_div[2] = 2;
-	} else if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV420 &&
-		   format->data_layout ==
-			   VDEF_RAW_DATA_LAYOUT_SEMI_PLANAR_Y_UV) {
-		height_div[1] = 2;
-	} else if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV422 &&
-		   format->data_layout == VDEF_RAW_DATA_LAYOUT_PLANAR_Y_U_V) {
-		stride_div[1] = stride_div[2] = 2;
-	} else if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV444 &&
-		   format->data_layout ==
-			   VDEF_RAW_DATA_LAYOUT_SEMI_PLANAR_Y_UV) {
-		height_mul[1] = 2;
-	} else {
-		memset(height_div, plane_count, sizeof(height_div));
+		stride_div[1] = stride_div[2] = plane_count - 1;
+	} else if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV422) {
+		stride_div[1] = stride_div[2] = plane_count - 1;
+	} else if (format->pix_format == VDEF_RAW_PIX_FORMAT_YUV444) {
+		stride_mul[1] = 4 - plane_count;
+	} else if (plane_count == 1) {
+		stride_mul[0] = component_count;
 	}
 
 	/* Calculate size for each plane */

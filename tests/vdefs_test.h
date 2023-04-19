@@ -34,6 +34,7 @@
 #include <CUnit/CUnit.h>
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,6 +42,7 @@
 
 
 extern CU_TestInfo g_vdef_test_csv[];
+extern CU_TestInfo g_vdef_test_calc[];
 
 
 #endif /* _VDEFS_TEST_H_ */

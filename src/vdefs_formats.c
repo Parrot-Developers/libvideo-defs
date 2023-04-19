@@ -84,7 +84,25 @@ VDEF_MAKE_RAW_FORMAT(vdef_raw14_packed,
 		     14);
 VDEF_MAKE_RAW_FORMAT(vdef_raw14, RAW, A, LINEAR, 14, PACKED, true, true, 16);
 VDEF_MAKE_RAW_FORMAT(vdef_raw16, RAW, A, LINEAR, 16, PACKED, false, true, 16);
+VDEF_MAKE_RAW_FORMAT(vdef_raw16_be,
+		     RAW,
+		     A,
+		     LINEAR,
+		     16,
+		     PACKED,
+		     false,
+		     false,
+		     16);
 VDEF_MAKE_RAW_FORMAT(vdef_raw32, RAW, A, LINEAR, 32, PACKED, false, true, 32);
+VDEF_MAKE_RAW_FORMAT(vdef_raw32_be,
+		     RAW,
+		     A,
+		     LINEAR,
+		     32,
+		     PACKED,
+		     false,
+		     false,
+		     32);
 
 
 /* GRAY */
@@ -92,7 +110,7 @@ VDEF_MAKE_RAW_FORMAT(vdef_gray, GRAY, A, LINEAR, 8, PACKED, false, false, 8);
 VDEF_MAKE_RAW_FORMAT(vdef_gray16, GRAY, A, LINEAR, 16, PACKED, false, true, 16);
 
 
-/* YUV422 planar (I420 / YV12) */
+/* YUV420 planar (I420 / YV12) */
 VDEF_MAKE_RAW_FORMAT(vdef_i420,
 		     YUV420,
 		     YUV,
@@ -296,6 +314,18 @@ VDEF_MAKE_RAW_FORMAT(vdef_nv21_10_16be_high,
 		     16);
 
 
+/* YUV444 planar (I444) */
+VDEF_MAKE_RAW_FORMAT(vdef_i444,
+		     YUV444,
+		     YUV,
+		     LINEAR,
+		     8,
+		     PLANAR,
+		     false,
+		     false,
+		     8);
+
+
 /* RGB24 */
 VDEF_MAKE_RAW_FORMAT(vdef_rgb, RGB24, RGB, LINEAR, 8, PACKED, false, false, 8);
 VDEF_MAKE_RAW_FORMAT(vdef_bgr, RGB24, BGR, LINEAR, 8, PACKED, false, false, 8);
@@ -329,6 +359,7 @@ VDEF_MAKE_RAW_FORMAT(vdef_bgra,
 		     false,
 		     false,
 		     8);
+
 
 /* Bayer 8-bits */
 VDEF_MAKE_RAW_FORMAT(vdef_bayer_rggb,
@@ -601,6 +632,7 @@ VDEF_MAKE_RAW_FORMAT(vdef_bayer_gbrg_14,
 		     true,
 		     true,
 		     16);
+
 
 /* Hardware specific formats */
 VDEF_MAKE_RAW_FORMAT(vdef_nv21_hisi_tile,

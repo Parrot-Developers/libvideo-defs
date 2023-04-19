@@ -346,6 +346,24 @@ struct vdef_rect {
 };
 
 
+/* Rectangle (float) for normalized coordinates [0.0 .. 1.0] */
+struct vdef_rectf {
+	/* Horizontal offset of the top-left corner of the rectangle (negative
+	 * value means the rectangle is centered horizontally) */
+	float left;
+
+	/* Vertical offset of the top-left corner of the rectangle (negative
+	 * value means the rectangle is centered vertically) */
+	float top;
+
+	/* Rectangle width */
+	float width;
+
+	/* Rectangle height */
+	float height;
+};
+
+
 /* Fraction */
 struct vdef_frac {
 	/* Numerator of the fraction */
@@ -654,11 +672,13 @@ extern VDEF_API const struct vdef_raw_format vdef_raw12;
 extern VDEF_API const struct vdef_raw_format vdef_raw14_packed;
 extern VDEF_API const struct vdef_raw_format vdef_raw14;
 extern VDEF_API const struct vdef_raw_format vdef_raw16;
+extern VDEF_API const struct vdef_raw_format vdef_raw16_be;
 extern VDEF_API const struct vdef_raw_format vdef_raw32;
+extern VDEF_API const struct vdef_raw_format vdef_raw32_be;
 /* GRAY formats */
 extern VDEF_API const struct vdef_raw_format vdef_gray;
 extern VDEF_API const struct vdef_raw_format vdef_gray16;
-/* YUV422 planar formats */
+/* YUV420 planar formats */
 extern VDEF_API const struct vdef_raw_format vdef_i420;
 extern VDEF_API const struct vdef_raw_format vdef_i420_10_16le;
 extern VDEF_API const struct vdef_raw_format vdef_i420_10_16be;
@@ -682,6 +702,8 @@ extern VDEF_API const struct vdef_raw_format vdef_nv21_10_16le;
 extern VDEF_API const struct vdef_raw_format vdef_nv21_10_16be;
 extern VDEF_API const struct vdef_raw_format vdef_nv21_10_16le_high;
 extern VDEF_API const struct vdef_raw_format vdef_nv21_10_16be_high;
+/* YUV444 planar formats */
+extern VDEF_API const struct vdef_raw_format vdef_i444;
 /* RGB24 formats */
 extern VDEF_API const struct vdef_raw_format vdef_rgb;
 extern VDEF_API const struct vdef_raw_format vdef_bgr;
@@ -1080,6 +1102,15 @@ VDEF_API char *vdef_raw_format_to_str(const struct vdef_raw_format *format);
  */
 VDEF_API unsigned int
 vdef_get_raw_frame_plane_count(const struct vdef_raw_format *format);
+
+
+/**
+ * Get the raw frame component count for a given raw frame format.
+ * @param format: raw frame format
+ * @return the component count for the format or 0 if unknown
+ */
+VDEF_API unsigned int
+vdef_get_raw_frame_component_count(enum vdef_raw_pix_format pix_format);
 
 
 /**

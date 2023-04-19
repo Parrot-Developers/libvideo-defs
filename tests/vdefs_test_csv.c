@@ -36,7 +36,9 @@ static void test_csv_raw_format(void)
 	const char *str_i420 = "format=i420";
 	const char *str_nv12 = "format=nv12";
 	const char *str_gray = "format=gray";
+	const char *str_raw16_be = "format=raw16_be";
 	const char *str_raw32 = "format=raw32";
+	const char *str_raw32_be = "format=raw32_be";
 	struct vdef_raw_format format2 = {0};
 
 	struct vdef_raw_format format = {
@@ -133,6 +135,22 @@ static void test_csv_raw_format(void)
 
 	free(str);
 
+	/* Raw16_be */
+	format = vdef_raw16_be;
+
+	ret = vdef_raw_format_to_csv(&format, &str);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	memset(&format2, 0, sizeof(format2));
+	ret = vdef_raw_format_from_csv(str, &format2);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	ret2 = vdef_raw_format_cmp(&format, &format2);
+	CU_ASSERT_TRUE(ret2);
+
+	ret = strcmp(str, str_raw16_be);
+	CU_ASSERT_EQUAL(ret, 0);
+
 	/* Raw32 */
 	format = vdef_raw32;
 
@@ -147,6 +165,22 @@ static void test_csv_raw_format(void)
 	CU_ASSERT_TRUE(ret2);
 
 	ret = strcmp(str, str_raw32);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	/* Raw32_be */
+	format = vdef_raw32_be;
+
+	ret = vdef_raw_format_to_csv(&format, &str);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	memset(&format2, 0, sizeof(format2));
+	ret = vdef_raw_format_from_csv(str, &format2);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	ret2 = vdef_raw_format_cmp(&format, &format2);
+	CU_ASSERT_TRUE(ret2);
+
+	ret = strcmp(str, str_raw32_be);
 	CU_ASSERT_EQUAL(ret, 0);
 
 	free(str);
