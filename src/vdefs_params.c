@@ -165,9 +165,9 @@
  * chrominance are in the range [-0.5 .. +0.5] in full range
  * or values of luminance are in the range [LUMA_MIN / 255 .. LUMA_MAX / 255]
  * and values of chrominance are in the range
- * [CHROMA_MIN - CHROMA_ZERO / 255 .. CHROMA_MAX - CHROMA_ZERO / 255] in
+ * [(CHROMA_MIN - CHROMA_ZERO) / 255 .. (CHROMA_MAX - CHROMA_ZERO) / 255] in
  * limited range.
- * Note: this table share the same values as vdef_yuv_to_rgb_norm_offset.
+ * Note: this table is a negative of vdef_yuv_to_rgb_norm_offset.
  */
 /* clang-format off */
 const float vdef_rgb_to_yuv_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {
@@ -205,15 +205,15 @@ const float vdef_rgb_to_yuv_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {
 	 * share the same values */
 		{
 			/* Limited range */
-			-(float)VDEF_BT601_LUMA_MIN / 255.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_LUMA_MIN / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
 		},
 		{
 			/* Full range */
 			0.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
 		},
 	},
 	[VDEF_MATRIX_COEFS_BT601_625] = {
@@ -221,29 +221,29 @@ const float vdef_rgb_to_yuv_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {
 	 * share the same values */
 		{
 			/* Limited range */
-			-(float)VDEF_BT601_LUMA_MIN / 255.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_LUMA_MIN / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
 		},
 		{
 			/* Full range */
 			0.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT601_CHROMA_ZERO / 255.f,
 		},
 	},
 	[VDEF_MATRIX_COEFS_BT709] = {
 		{
 			/* Limited range */
-			-(float)VDEF_BT709_LUMA_MIN / 255.f,
-			-(float)VDEF_BT709_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT709_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT709_LUMA_MIN / 255.f,
+			(float)VDEF_BT709_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT709_CHROMA_ZERO / 255.f,
 		},
 		{
 			/* Full range */
 			0.f,
-			-(float)VDEF_BT709_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT709_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT709_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT709_CHROMA_ZERO / 255.f,
 		},
 	},
 	[VDEF_MATRIX_COEFS_BT2020_NON_CST] = {
@@ -252,15 +252,15 @@ const float vdef_rgb_to_yuv_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {
 	 * share the same values */
 		{
 			/* Limited range */
-			-(float)VDEF_BT2020_LUMA_MIN / 255.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_LUMA_MIN / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
 		},
 		{
 			/* Full range */
 			0.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
 		},
 	},
 	[VDEF_MATRIX_COEFS_BT2020_CST] = {
@@ -268,15 +268,15 @@ const float vdef_rgb_to_yuv_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {
 	 * share the same values */
 		{
 			/* Limited range */
-			-(float)VDEF_BT2020_LUMA_MIN / 255.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_LUMA_MIN / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
 		},
 		{
 			/* Full range */
 			0.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
-			-(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
+			(float)VDEF_BT2020_CHROMA_ZERO / 255.f,
 		},
 	},
 };
@@ -293,7 +293,7 @@ const float vdef_rgb_to_yuv_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {
  * chrominance are in the range [-0.5 .. +0.5] in full range
  * or values of luminance are in the range [LUMA_MIN / 255 .. LUMA_MAX / 255]
  * and values of chrominance are in the range
- * [CHROMA_MIN - CHROMA_ZERO / 255 .. CHROMA_MAX - CHROMA_ZERO / 255] in
+ * [(CHROMA_MIN - CHROMA_ZERO) / 255 .. (CHROMA_MAX - CHROMA_ZERO) / 255] in
  * limited range.
  */
 /* clang-format off */
@@ -635,7 +635,7 @@ const float vdef_rgb_to_yuv_norm_matrix[VDEF_MATRIX_COEFS_MAX][2][9] = {
  * Note: the matrix multiplication must be done after applying the offset:
  * RGB = (YUV + off) * mat
  * so that values of R, G and B are in the range [0.0 .. 1.0].
- * Note: this table share the same values as vdef_rgb_to_yuv_norm_offset.
+ * Note: this table is a negative of vdef_rgb_to_yuv_norm_offset.
  */
 /* clang-format off */
 const float vdef_yuv_to_rgb_norm_offset[VDEF_MATRIX_COEFS_MAX][2][3] = {

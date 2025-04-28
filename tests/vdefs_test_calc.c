@@ -161,7 +161,9 @@ static void run_single_test(const struct vdef_raw_format *fmt,
 
 static void run_test_case(struct test_case *t)
 {
-	printf("Testing %s\n", vdef_raw_format_to_str(t->fmt));
+	char *str = vdef_raw_format_to_str(t->fmt);
+	printf("Testing %s\n", str);
+	free(str);
 	int idx = 0;
 	struct single_test *st;
 	while (true) {
@@ -1666,7 +1668,9 @@ static void test_calc_raw_frame_size(void)
 
 static void test_calc_raw_contiguous_frame_size(void)
 {
-	printf("Testing %s\n", vdef_raw_format_to_str(i420.fmt));
+	char *str = vdef_raw_format_to_str(i420.fmt);
+	printf("Testing %s\n", str);
+	free(str);
 	int idx = 0;
 	struct single_test *st;
 	while (true) {

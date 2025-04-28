@@ -42,9 +42,12 @@ LOCAL_LIBRARIES := \
 	libvideo-defs
 LOCAL_CFLAGS := -std=gnu11
 LOCAL_SRC_FILES := \
-	tests/vdefs_test.c \
 	tests/vdefs_test_calc.c \
-	tests/vdefs_test_csv.c
+	tests/vdefs_test_csv.c \
+	tests/vdefs_test_frac.c \
+	tests/vdefs_test_framerate.c \
+	tests/vdefs_test_resolution.c \
+	tests/vdefs_test.c
 
 include $(BUILD_EXECUTABLE)
 

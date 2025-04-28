@@ -57,6 +57,7 @@ VDEF_ENUM_ASSERT(FRAME_FLAG, NO_CACHE_INVALIDATE, UINT64_MAX);
 VDEF_ENUM_ASSERT(FRAME_FLAG, NO_CACHE_CLEAN, UINT64_MAX);
 VDEF_ENUM_ASSERT(FRAME_FLAG, VISUAL_ERROR, UINT64_MAX);
 VDEF_ENUM_ASSERT(FRAME_FLAG, SILENT, UINT64_MAX);
+VDEF_ENUM_ASSERT(FRAME_FLAG, FAKE, UINT64_MAX);
 
 
 bool vdef_is_raw_format_valid(const struct vdef_raw_format *format)
@@ -231,15 +232,19 @@ bool vdef_is_coded_format_valid(const struct vdef_coded_format *format)
 	switch (format->encoding) {
 	case VDEF_ENCODING_JPEG:
 		/* JPEG data formats */
-		if ((data_format != VDEF_CODED_DATA_FORMAT_UNKNOWN) &&
-		    (data_format != VDEF_CODED_DATA_FORMAT_JFIF))
+		if (data_format != VDEF_CODED_DATA_FORMAT_JFIF)
+			return false;
+		break;
+
+	case VDEF_ENCODING_PNG:
+		/* PNG data formats */
+		if (data_format != VDEF_CODED_DATA_FORMAT_UNKNOWN)
 			return false;
 		break;
 
 	case VDEF_ENCODING_H264:
 		/* H.264 data formats */
-		if ((data_format != VDEF_CODED_DATA_FORMAT_UNKNOWN) &&
-		    (data_format != VDEF_CODED_DATA_FORMAT_RAW_NALU) &&
+		if ((data_format != VDEF_CODED_DATA_FORMAT_RAW_NALU) &&
 		    (data_format != VDEF_CODED_DATA_FORMAT_BYTE_STREAM) &&
 		    (data_format != VDEF_CODED_DATA_FORMAT_AVCC))
 			return false;
@@ -247,8 +252,7 @@ bool vdef_is_coded_format_valid(const struct vdef_coded_format *format)
 
 	case VDEF_ENCODING_H265:
 		/* H.265 data formats */
-		if ((data_format != VDEF_CODED_DATA_FORMAT_UNKNOWN) &&
-		    (data_format != VDEF_CODED_DATA_FORMAT_RAW_NALU) &&
+		if ((data_format != VDEF_CODED_DATA_FORMAT_RAW_NALU) &&
 		    (data_format != VDEF_CODED_DATA_FORMAT_BYTE_STREAM) &&
 		    (data_format != VDEF_CODED_DATA_FORMAT_HVCC))
 			return false;
@@ -256,27 +260,15 @@ bool vdef_is_coded_format_valid(const struct vdef_coded_format *format)
 
 	case VDEF_ENCODING_UNKNOWN:
 		/* Unknown encoding is invalid */
+		if ((data_format != VDEF_CODED_DATA_FORMAT_JFIF) &&
+		    (data_format != VDEF_CODED_DATA_FORMAT_RAW_NALU) &&
+		    (data_format != VDEF_CODED_DATA_FORMAT_BYTE_STREAM) &&
+		    (data_format != VDEF_CODED_DATA_FORMAT_HVCC))
+			return false;
 		break;
 
 	default:
 		/* Bad encoding value */
-		return false;
-	}
-
-	/* Data format */
-	switch (data_format) {
-	case VDEF_CODED_DATA_FORMAT_JFIF:
-	case VDEF_CODED_DATA_FORMAT_RAW_NALU:
-	case VDEF_CODED_DATA_FORMAT_BYTE_STREAM:
-	case VDEF_CODED_DATA_FORMAT_AVCC:
-		break;
-
-	case VDEF_CODED_DATA_FORMAT_UNKNOWN:
-		/* Unknown data format is invalid */
-		return false;
-
-	default:
-		/* Bad data format value */
 		return false;
 	}
 
@@ -584,7 +576,7 @@ static const struct {
 	{"nv21_hisi_tiled_10_packed", &vdef_nv21_hisi_tile_10_packed},
 	{"nv21_hisi_tiled_compressed_10_packed",
 	 &vdef_nv21_hisi_tile_compressed_10_packed},
-	{"mmal_opaque", &vdef_mmal_opaque},
+	{"opaque", &vdef_opaque},
 };
 
 
@@ -875,6 +867,8 @@ enum vdef_encoding vdef_encoding_from_str(const char *str)
 {
 	if ((strcasecmp(str, "JPEG") == 0) || (strcasecmp(str, "MJPEG") == 0)) {
 		return VDEF_ENCODING_JPEG;
+	} else if (strcasecmp(str, "PNG") == 0) {
+		return VDEF_ENCODING_PNG;
 	} else if ((strcasecmp(str, "H264") == 0) ||
 		   (strcasecmp(str, "AVC") == 0)) {
 		return VDEF_ENCODING_H264;
@@ -895,6 +889,8 @@ const char *vdef_encoding_to_str(enum vdef_encoding encoding)
 	switch (encoding) {
 	case VDEF_ENCODING_JPEG:
 		return "JPEG";
+	case VDEF_ENCODING_PNG:
+		return "PNG";
 	case VDEF_ENCODING_H264:
 		return "H264";
 	case VDEF_ENCODING_H265:
@@ -910,6 +906,8 @@ const char *vdef_get_encoding_mime_type(enum vdef_encoding encoding)
 	switch (encoding) {
 	case VDEF_ENCODING_JPEG:
 		return "image/jpeg";
+	case VDEF_ENCODING_PNG:
+		return "image/png";
 	case VDEF_ENCODING_H264:
 		return "video/avc";
 	case VDEF_ENCODING_H265:
@@ -968,6 +966,7 @@ static const struct {
 	{"h265_byte_stream", &vdef_h265_byte_stream},
 	{"h265_hvcc", &vdef_h265_hvcc},
 	{"jpeg_jfif", &vdef_jpeg_jfif},
+	{"png", &vdef_png},
 };
 
 
@@ -1670,6 +1669,304 @@ bool vdef_dim_is_aligned(const struct vdef_dim *dim,
 }
 
 
+/**
+ * Build a resolution from:
+ * - width and height
+ */
+#define MAKE_RESOLUTION(w, h)                                                  \
+	{                                                                      \
+		VDEF_RESOLUTION_##w##X##h, NULL, #w "x" #h,                    \
+		{                                                              \
+			w, h                                                   \
+		}                                                              \
+	}
+
+
+/**
+ * Build a resolution from:
+ * - preset name (eg. 'UXGA'),
+ * - width and height
+ */
+#define MAKE_RESOLUTION_PRESET(preset, w, h)                                   \
+	{                                                                      \
+		VDEF_RESOLUTION_##preset, #preset, #w "x" #h,                  \
+		{                                                              \
+			w, h                                                   \
+		}                                                              \
+	}
+
+
+/**
+ * Build a resolution from:
+ * - width and height
+ * Note: preset is of form 'height'p, enum 'height'P
+ *     e.g.: for 1280, 720: 720p / 720P
+ */
+#define MAKE_RESOLUTION_PRESET_P(w, h)                                         \
+	{                                                                      \
+		VDEF_RESOLUTION_##h##P, #h "p", #w "x" #h,                     \
+		{                                                              \
+			w, h                                                   \
+		}                                                              \
+	}
+
+
+/**
+ * Build a resolution from:
+ * - Mpx count, width and height
+ */
+#define MAKE_RESOLUTION_PRESET_MPX(mpx, w, h)                                  \
+	{                                                                      \
+		VDEF_RESOLUTION_##mpx##MPX, #mpx "Mpx", #w "x" #h,             \
+		{                                                              \
+			w, h                                                   \
+		}                                                              \
+	}
+
+
+struct {
+	enum vdef_resolution res;
+	const char *preset_str;
+	const char *str;
+	struct vdef_dim dim;
+} resolution_map[] = {
+	/**
+	 * 16:9 resolutions
+	 */
+	MAKE_RESOLUTION_PRESET_P(214, 120),
+	MAKE_RESOLUTION_PRESET_P(256, 144),
+	MAKE_RESOLUTION_PRESET_P(320, 180),
+	MAKE_RESOLUTION_PRESET_P(426, 240),
+	MAKE_RESOLUTION_PRESET_P(512, 288),
+	MAKE_RESOLUTION_PRESET_P(640, 360),
+	MAKE_RESOLUTION_PRESET_P(854, 480),
+	MAKE_RESOLUTION_PRESET_P(1280, 720),
+	MAKE_RESOLUTION_PRESET_P(1920, 1080),
+	MAKE_RESOLUTION_PRESET_P(3840, 2160),
+	MAKE_RESOLUTION_PRESET(DCI4K, 4096, 2160),
+
+	/**
+	 * 4:3 resolutions
+	 */
+	MAKE_RESOLUTION_PRESET(QQVGA, 160, 120),
+	MAKE_RESOLUTION(192, 144),
+	MAKE_RESOLUTION(240, 180),
+	MAKE_RESOLUTION_PRESET(QVGA, 320, 240),
+	MAKE_RESOLUTION(384, 288),
+	MAKE_RESOLUTION(480, 360),
+	MAKE_RESOLUTION_PRESET(VGA, 640, 480),
+	MAKE_RESOLUTION_PRESET(D1_NTSC, 720, 480),
+	MAKE_RESOLUTION_PRESET(D1_PAL, 720, 576),
+	MAKE_RESOLUTION_PRESET(SVGA, 800, 600),
+	MAKE_RESOLUTION_PRESET(XGA, 1024, 768),
+	MAKE_RESOLUTION_PRESET(SXGA, 1280, 1024),
+	MAKE_RESOLUTION_PRESET(UXGA, 1600, 1200),
+	MAKE_RESOLUTION_PRESET_MPX(12, 4000, 3000),
+	MAKE_RESOLUTION_PRESET_MPX(21, 5344, 4016),
+	MAKE_RESOLUTION_PRESET_MPX(48, 8000, 6000),
+
+	/**
+	 * Special resolutions
+	 */
+	MAKE_RESOLUTION(176, 90),
+	MAKE_RESOLUTION(176, 128),
+	MAKE_RESOLUTION(1408, 720),
+	MAKE_RESOLUTION(2048, 544),
+	MAKE_RESOLUTION(1024, 544),
+	MAKE_RESOLUTION(1024, 272),
+	MAKE_RESOLUTION(1024, 272),
+	MAKE_RESOLUTION(512, 136),
+	MAKE_RESOLUTION(256, 136),
+	MAKE_RESOLUTION(1280, 800),
+	MAKE_RESOLUTION(2560, 832),
+	MAKE_RESOLUTION(1280, 832),
+	MAKE_RESOLUTION(864, 480),
+	MAKE_RESOLUTION(432, 240),
+	MAKE_RESOLUTION(640, 512),
+};
+
+
+enum vdef_resolution vdef_resolution_from_str(const char *str)
+{
+	if (!str)
+		return VDEF_RESOLUTION_UNKNOWN;
+
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(resolution_map); i++) {
+		if (!strcasecmp(resolution_map[i].str, str))
+			return resolution_map[i].res;
+		if (resolution_map[i].preset_str != NULL &&
+		    !strcasecmp(resolution_map[i].preset_str, str))
+			return resolution_map[i].res;
+	}
+
+	return VDEF_RESOLUTION_UNKNOWN;
+}
+
+
+const char *vdef_resolution_to_str(enum vdef_resolution res)
+{
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(resolution_map); i++) {
+		if (resolution_map[i].res == res)
+			return resolution_map[i].preset_str != NULL
+				       ? resolution_map[i].preset_str
+				       : resolution_map[i].str;
+	}
+
+	return "UNKNOWN";
+}
+
+
+enum vdef_resolution vdef_resolution_from_dim(const struct vdef_dim *dim)
+{
+	if (!dim)
+		return VDEF_RESOLUTION_UNKNOWN;
+
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(resolution_map); i++) {
+		if (vdef_dim_cmp(&resolution_map[i].dim, dim))
+			return resolution_map[i].res;
+	}
+
+	return VDEF_RESOLUTION_UNKNOWN;
+}
+
+
+int vdef_resolution_to_dim(enum vdef_resolution res, struct vdef_dim *dim)
+{
+	if (!dim)
+		return -EINVAL;
+
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(resolution_map); i++) {
+		if (resolution_map[i].res == res) {
+			*dim = resolution_map[i].dim;
+			return 0;
+		}
+	}
+
+	return -ENOENT;
+}
+
+
+/**
+ * Build a framerate from:
+ * - numerator and denominator
+ */
+#define MAKE_FRAMERATE(n, d)                                                   \
+	{                                                                      \
+		VDEF_FRAMERATE_##n##_##d, NULL, #n "/" #d,                     \
+		{                                                              \
+			n, d                                                   \
+		}                                                              \
+	}
+
+
+/**
+ * Build a framerate from:
+ * - preset name (eg. '30'),
+ * - numerator and denominator
+ */
+#define MAKE_FRAMERATE_PRESET(preset, n, d)                                    \
+	{                                                                      \
+		VDEF_FRAMERATE_##preset, #preset, #n "/" #d,                   \
+		{                                                              \
+			n, d                                                   \
+		}                                                              \
+	}
+
+
+struct {
+	enum vdef_framerate rate;
+	const char *preset_str;
+	const char *str;
+	struct vdef_frac frac;
+} framerate_map[] = {
+	/**
+	 * Common framerates
+	 */
+	MAKE_FRAMERATE_PRESET(24, 24000, 1001),
+	MAKE_FRAMERATE_PRESET(25, 25, 1),
+	MAKE_FRAMERATE_PRESET(30, 30000, 1001),
+
+	MAKE_FRAMERATE_PRESET(48, 48000, 1001),
+	MAKE_FRAMERATE_PRESET(50, 50, 1),
+	MAKE_FRAMERATE_PRESET(60, 60000, 1001),
+
+	MAKE_FRAMERATE_PRESET(96, 96000, 1001),
+	MAKE_FRAMERATE_PRESET(100, 100, 1),
+	MAKE_FRAMERATE_PRESET(120, 120000, 1001),
+
+	MAKE_FRAMERATE_PRESET(192, 192000, 1001),
+	MAKE_FRAMERATE_PRESET(200, 200, 1),
+	MAKE_FRAMERATE_PRESET(240, 240000, 1001),
+
+	/**
+	 * Special framerates
+	 */
+	MAKE_FRAMERATE(60, 7),
+	MAKE_FRAMERATE(60, 8),
+	MAKE_FRAMERATE(30, 1),
+};
+
+
+enum vdef_framerate vdef_framerate_from_str(const char *str)
+{
+	if (!str)
+		return VDEF_FRAMERATE_UNKNOWN;
+
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(framerate_map); i++) {
+		if (!strcasecmp(framerate_map[i].str, str))
+			return framerate_map[i].rate;
+		if (framerate_map[i].preset_str != NULL &&
+		    !strcasecmp(framerate_map[i].preset_str, str))
+			return framerate_map[i].rate;
+	}
+
+	return VDEF_FRAMERATE_UNKNOWN;
+}
+
+
+const char *vdef_framerate_to_str(enum vdef_framerate rate)
+{
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(framerate_map); i++) {
+		if (framerate_map[i].rate == rate)
+			return framerate_map[i].preset_str != NULL
+				       ? framerate_map[i].preset_str
+				       : framerate_map[i].str;
+	}
+
+	return "UNKNOWN";
+}
+
+
+enum vdef_framerate vdef_framerate_from_frac(const struct vdef_frac *frac)
+{
+	if (!frac)
+		return VDEF_FRAMERATE_UNKNOWN;
+
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(framerate_map); i++) {
+		if (vdef_frac_diff(&framerate_map[i].frac, frac) == 0)
+			return framerate_map[i].rate;
+	}
+
+	return VDEF_FRAMERATE_UNKNOWN;
+}
+
+
+int vdef_framerate_to_frac(enum vdef_framerate rate, struct vdef_frac *frac)
+{
+	if (!frac)
+		return -EINVAL;
+
+	for (unsigned int i = 0; i < VDEF_ARRAY_SIZE(framerate_map); i++) {
+		if (framerate_map[i].rate == rate) {
+			*frac = framerate_map[i].frac;
+			return 0;
+		}
+	}
+
+	return -ENOENT;
+}
+
+
 bool vdef_rect_fit(const struct vdef_rect *rect, const struct vdef_rect *bounds)
 {
 	if (!rect || !bounds || bounds->left < 0 || bounds->top < 0 ||
@@ -1746,6 +2043,8 @@ void vdef_format_to_frame_info(const struct vdef_format_info *format,
 		.color_primaries = format->color_primaries,
 		.transfer_function = format->transfer_function,
 		.matrix_coefs = format->matrix_coefs,
+		.dynamic_range = format->dynamic_range,
+		.tone_mapping = format->tone_mapping,
 		.resolution = format->resolution,
 		.sar = format->sar,
 	};
@@ -1764,6 +2063,8 @@ void vdef_frame_to_format_info(const struct vdef_frame_info *frame,
 		.color_primaries = frame->color_primaries,
 		.transfer_function = frame->transfer_function,
 		.matrix_coefs = frame->matrix_coefs,
+		.dynamic_range = frame->dynamic_range,
+		.tone_mapping = frame->tone_mapping,
 		.resolution = frame->resolution,
 		.sar = frame->sar,
 	};

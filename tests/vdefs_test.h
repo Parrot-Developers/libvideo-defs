@@ -40,9 +40,14 @@
 
 #define FN(_name) (char *)_name
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
 
-extern CU_TestInfo g_vdef_test_csv[];
+
 extern CU_TestInfo g_vdef_test_calc[];
+extern CU_TestInfo g_vdef_test_csv[];
+extern CU_TestInfo g_vdef_test_frac[];
+extern CU_TestInfo g_vdef_test_framerate[];
+extern CU_TestInfo g_vdef_test_resolution[];
 
 
 #endif /* _VDEFS_TEST_H_ */

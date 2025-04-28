@@ -671,7 +671,7 @@ VDEF_MAKE_RAW_FORMAT(vdef_nv21_hisi_tile_compressed_10_packed,
 		     false,
 		     false,
 		     10);
-VDEF_MAKE_RAW_FORMAT(vdef_mmal_opaque,
+VDEF_MAKE_RAW_FORMAT(vdef_opaque,
 		     UNKNOWN,
 		     UNKNOWN,
 		     UNKNOWN,
@@ -711,3 +711,6 @@ VDEF_MAKE_CODED_FORMAT(vdef_h265_hvcc, H265, HVCC);
 
 
 VDEF_MAKE_CODED_FORMAT(vdef_jpeg_jfif, JPEG, JFIF);
+
+
+VDEF_MAKE_CODED_FORMAT(vdef_png, PNG, UNKNOWN);

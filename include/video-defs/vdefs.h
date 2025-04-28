@@ -315,6 +315,12 @@ enum vdef_frame_flag {
 	/* Whether the frame contains a slice for which there is a long-term
 	 * reference picture list modification */
 	VDEF_FRAME_FLAG_USES_LTR = (1 << 6),
+
+	/* This frame is a fake frame
+	 * This flag is usually applied to the first grey frames added at the
+	 * beginning of a late track to synchronize tracks together.
+	 * Fake frames neither have capture_timestamp nor metadata */
+	VDEF_FRAME_FLAG_FAKE = (1 << 7),
 };
 
 
@@ -325,6 +331,217 @@ struct vdef_dim {
 
 	/* Dimension height */
 	unsigned int height;
+};
+
+
+/* Common resolutions */
+enum vdef_resolution {
+	/* Unknown resolution */
+	VDEF_RESOLUTION_UNKNOWN = 0,
+
+	/**
+	 * 16:9 resolutions
+	 */
+
+	/* 214 x 120 */
+	VDEF_RESOLUTION_120P,
+
+	/* 256 x 144 */
+	VDEF_RESOLUTION_144P,
+
+	/* 320 x 180 */
+	VDEF_RESOLUTION_180P,
+
+	/* 426 x 240 */
+	VDEF_RESOLUTION_240P,
+
+	/* 512 x 288 */
+	VDEF_RESOLUTION_288P,
+
+	/* 640 x 360 */
+	VDEF_RESOLUTION_360P,
+
+	/* 854 x 480 */
+	VDEF_RESOLUTION_480P,
+
+	/* 1280 x 720 */
+	VDEF_RESOLUTION_720P,
+
+	/* 1920 x 1080 */
+	VDEF_RESOLUTION_1080P,
+
+	/* 3840 x 2160 */
+	VDEF_RESOLUTION_2160P,
+
+	/* 4096 x 2160 */
+	VDEF_RESOLUTION_DCI4K,
+
+	/**
+	 * 4:3 resolutions
+	 */
+
+	/* 160 x 120 */
+	VDEF_RESOLUTION_QQVGA,
+
+	/* 192 x 144 */
+	VDEF_RESOLUTION_192X144,
+
+	/* 240 x 180 */
+	VDEF_RESOLUTION_240X180,
+
+	/* 320 x 240 */
+	VDEF_RESOLUTION_QVGA,
+
+	/* 384 x 288 */
+	VDEF_RESOLUTION_384X288,
+
+	/* 480 x 360 */
+	VDEF_RESOLUTION_480X360,
+
+	/* 640 x 480 */
+	VDEF_RESOLUTION_VGA,
+
+	/* 720 x 480 */
+	VDEF_RESOLUTION_D1_NTSC,
+
+	/* 720 x 576 */
+	VDEF_RESOLUTION_D1_PAL,
+
+	/* 800 x 600 */
+	VDEF_RESOLUTION_SVGA,
+
+	/* 1024 x 768 */
+	VDEF_RESOLUTION_XGA,
+
+	/* 1280 x 1024 */
+	VDEF_RESOLUTION_SXGA,
+
+	/* 1600 x 1200 */
+	VDEF_RESOLUTION_UXGA,
+
+	/* 4000 x 3000 */
+	VDEF_RESOLUTION_12MPX,
+
+	/* 5344 x 4016 */
+	VDEF_RESOLUTION_21MPX,
+
+	/* 8000 x 6000 */
+	VDEF_RESOLUTION_48MPX,
+
+	/**
+	 * Special resolutions
+	 */
+
+	/* 176 x 90 */
+	VDEF_RESOLUTION_176X90,
+
+	/* 176 x 128 */
+	VDEF_RESOLUTION_176X128,
+
+	/* 1408 x 720 */
+	VDEF_RESOLUTION_1408X720,
+
+	/* 2048 x 544 */
+	VDEF_RESOLUTION_2048X544,
+
+	/* 1024 x 544 */
+	VDEF_RESOLUTION_1024X544,
+
+	/* 1024 x 272 */
+	VDEF_RESOLUTION_1024X272,
+
+	/* 512 x 272 */
+	VDEF_RESOLUTION_512X272,
+
+	/* 512 x 136 */
+	VDEF_RESOLUTION_512X136,
+
+	/* 256 x 136*/
+	VDEF_RESOLUTION_256X136,
+
+	/* 1280 x 800 */
+	VDEF_RESOLUTION_1280X800,
+
+	/* 2560 x 832 */
+	VDEF_RESOLUTION_2560X832,
+
+	/* 1280 x 832 */
+	VDEF_RESOLUTION_1280X832,
+
+	/* 864 x 480 */
+	VDEF_RESOLUTION_864X480,
+
+	/* 432 x 240 */
+	VDEF_RESOLUTION_432X240,
+
+	/* 640 x 512 */
+	VDEF_RESOLUTION_640X512,
+
+	/* Element count */
+	VDEF_RESOLUTION_MAX,
+};
+
+
+/* Common framerates */
+enum vdef_framerate {
+	/* Unknown framerate */
+	VDEF_FRAMERATE_UNKNOWN = 0,
+
+	/**
+	 * Standard framerates
+	 */
+
+	/* 24000/1001 */
+	VDEF_FRAMERATE_24,
+
+	/* 25/1 */
+	VDEF_FRAMERATE_25,
+
+	/* 30000/1001 */
+	VDEF_FRAMERATE_30,
+
+	/* 48000/1001 */
+	VDEF_FRAMERATE_48,
+
+	/* 50/1 */
+	VDEF_FRAMERATE_50,
+
+	/* 60000/1001 */
+	VDEF_FRAMERATE_60,
+
+	/* 96000/1001 */
+	VDEF_FRAMERATE_96,
+
+	/* 100/1 */
+	VDEF_FRAMERATE_100,
+
+	/* 12000/1001 */
+	VDEF_FRAMERATE_120,
+
+	/* 192000/1001 */
+	VDEF_FRAMERATE_192,
+
+	/* 200/1 */
+	VDEF_FRAMERATE_200,
+
+	/* 240000/1001 */
+	VDEF_FRAMERATE_240,
+
+	/**
+	 * Special framerates
+	 */
+
+	/* 60/7 */
+	VDEF_FRAMERATE_60_7,
+
+	/* 60/8 */
+	VDEF_FRAMERATE_60_8,
+
+	/* 30/1 */
+	VDEF_FRAMERATE_30_1,
+
+	/* Element count */
+	VDEF_FRAMERATE_MAX,
 };
 
 
@@ -746,7 +963,7 @@ extern VDEF_API const struct vdef_raw_format vdef_nv21_hisi_tile_compressed;
 extern VDEF_API const struct vdef_raw_format vdef_nv21_hisi_tile_10_packed;
 extern VDEF_API const struct vdef_raw_format
 	vdef_nv21_hisi_tile_compressed_10_packed;
-extern VDEF_API const struct vdef_raw_format vdef_mmal_opaque;
+extern VDEF_API const struct vdef_raw_format vdef_opaque;
 
 
 /* Raw frame */
@@ -784,6 +1001,9 @@ enum vdef_encoding {
 	/* ISO/IEC 23008-2 HEVC / ITU-T H.265 */
 	VDEF_ENCODING_H265,
 	VDEF_ENCODING_HEVC = VDEF_ENCODING_H265,
+
+	/* ISO/IEC 15948:2004 */
+	VDEF_ENCODING_PNG
 };
 
 
@@ -826,7 +1046,7 @@ extern VDEF_API const struct vdef_coded_format vdef_h265_raw_nalu;
 extern VDEF_API const struct vdef_coded_format vdef_h265_byte_stream;
 extern VDEF_API const struct vdef_coded_format vdef_h265_hvcc;
 extern VDEF_API const struct vdef_coded_format vdef_jpeg_jfif;
-
+extern VDEF_API const struct vdef_coded_format vdef_png;
 
 /* Coded frame type */
 enum vdef_coded_frame_type {
@@ -896,6 +1116,10 @@ struct vdef_coded_frame {
 
 	/* Frame type */
 	enum vdef_coded_frame_type type;
+
+	/* Layer, for layer-based encoding (0 means base,
+	 * UINT8_MAX means unknown) */
+	uint8_t layer;
 };
 
 
@@ -1568,6 +1792,91 @@ VDEF_API bool vdef_dim_is_aligned(const struct vdef_dim *dim,
 
 
 /**
+ * Get an enum vdef_resolution value from a string.
+ * The case is ignored.
+ * @param str: resolution name to convert (eg. '180p').
+ * @return the enum vdef_resolution value or VDEF_RESOLUTION_UNKNOWN if unknown
+ */
+VDEF_API enum vdef_resolution vdef_resolution_from_str(const char *str);
+
+
+/**
+ * Get a string from an enum vdef_resolution value.
+ * @param res: resolution to convert
+ * @return a string description of the resolution
+ */
+VDEF_API const char *vdef_resolution_to_str(enum vdef_resolution res);
+
+
+/**
+ * Get an enum vdef_resolution value from a struct vdef_dim.
+ * @param dim: struct vdef_dim resolution to convert
+ * @return the enum vdef_resolution value or VDEF_RESOLUTION_UNKNOWN if unknown
+ */
+VDEF_API enum vdef_resolution
+vdef_resolution_from_dim(const struct vdef_dim *dim);
+
+
+/**
+ * Get an enum vdef_resolution value from a struct vdef_dim.
+ * @param res: resolution to convert
+ * @param dim: resolution format to fill
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API int vdef_resolution_to_dim(enum vdef_resolution res,
+				    struct vdef_dim *dim);
+
+
+/**
+ * Get an enum vdef_framerate value from a string.
+ * The case is ignored.
+ * @param str: framerate name to convert (eg. '30000/1001').
+ * @return the enum vdef_framerate value or VDEF_FRAMERATE_UNKNOWN if unknown
+ */
+VDEF_API enum vdef_framerate vdef_framerate_from_str(const char *str);
+
+
+/**
+ * Get a string from an enum vdef_framerate value.
+ * @param rate: framerate to convert
+ * @return a string description of the framerate
+ */
+VDEF_API const char *vdef_framerate_to_str(enum vdef_framerate rate);
+
+
+/**
+ * Get an enum vdef_framerate value from a struct vdef_frac.
+ * @param frac: struct vdef_frac framerate to convert
+ * @return the enum vdef_framerate value or VDEF_FRAMERATE_UNKNOWN if unknown
+ */
+VDEF_API enum vdef_framerate
+vdef_framerate_from_frac(const struct vdef_frac *frac);
+
+
+/**
+ * Get an enum vdef_framerate value from a struct vdef_frac.
+ * @param rate: framerate to convert
+ * @param frac: framerate format to fill
+ * @return 0 on success, negative errno value in case of error
+ */
+VDEF_API int vdef_framerate_to_frac(enum vdef_framerate rate,
+				    struct vdef_frac *frac);
+
+
+/**
+ * Check if fraction is equal to zero.
+ * The two components of the fraction are compared to zero and if one them is,
+ * true is returned.
+ * @param frac: the fraction to check
+ * @return true if the fraction is equal to zero, false otherwise
+ */
+static inline bool vdef_frac_is_null(const struct vdef_frac *frac)
+{
+	return !frac || !frac->num || !frac->den;
+}
+
+
+/**
  * Compare two struct vdef_frac.
  * The two fraction values are compared and the function returns:
  *  - < 0: if f1 is lower than f2,
@@ -1582,21 +1891,14 @@ static inline int vdef_frac_diff(const struct vdef_frac *f1,
 {
 	if (!f1 || !f2)
 		return -1;
+	if (vdef_frac_is_null(f1) && vdef_frac_is_null(f2))
+		return 0;
+	if (vdef_frac_is_null(f1))
+		return -1;
+	if (vdef_frac_is_null(f2))
+		return 1;
 	return (int)(((int64_t)f1->num * f2->den) -
 		     ((int64_t)f1->den * f2->num));
-}
-
-
-/**
- * Check if fraction is equal to zero.
- * The two components of the fraction are compared to zero and if one them is,
- * true is returned.
- * @param frac: the fraction to check
- * @return true if the fraction is equal to zero, false otherwise
- */
-static inline bool vdef_frac_is_null(const struct vdef_frac *frac)
-{
-	return !frac || !frac->num || !frac->den;
 }
 
 

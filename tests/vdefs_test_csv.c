@@ -151,6 +151,8 @@ static void test_csv_raw_format(void)
 	ret = strcmp(str, str_raw16_be);
 	CU_ASSERT_EQUAL(ret, 0);
 
+	free(str);
+
 	/* Raw32 */
 	format = vdef_raw32;
 
@@ -166,6 +168,8 @@ static void test_csv_raw_format(void)
 
 	ret = strcmp(str, str_raw32);
 	CU_ASSERT_EQUAL(ret, 0);
+
+	free(str);
 
 	/* Raw32_be */
 	format = vdef_raw32_be;
@@ -193,6 +197,7 @@ static void test_csv_coded_format(void)
 	bool ret2;
 	char *str = NULL;
 	const char *str_jpeg_jfif = "format=jpeg_jfif";
+	const char *str_png = "format=png";
 	const char *str_h264_raw_nalu = "format=h264_raw_nalu";
 	const char *str_h265_byte_stream = "format=h265_byte_stream";
 	struct vdef_coded_format format2 = {0};
@@ -227,6 +232,24 @@ static void test_csv_coded_format(void)
 	CU_ASSERT_TRUE(ret2);
 
 	ret = strcmp(str, str_jpeg_jfif);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	free(str);
+
+	/* PNG/UNKNOWN */
+	format = vdef_png;
+
+	ret = vdef_coded_format_to_csv(&format, &str);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	memset(&format2, 0, sizeof(format2));
+	ret = vdef_coded_format_from_csv(str, &format2);
+	CU_ASSERT_EQUAL(ret, 0);
+
+	ret2 = vdef_coded_format_cmp(&format, &format2);
+	CU_ASSERT_TRUE(ret2);
+
+	ret = strcmp(str, str_png);
 	CU_ASSERT_EQUAL(ret, 0);
 
 	free(str);
