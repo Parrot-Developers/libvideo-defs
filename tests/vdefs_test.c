@@ -32,7 +32,9 @@ static CU_SuiteInfo s_suites[] = {
 	{FN("csv"), NULL, NULL, g_vdef_test_csv},
 	{FN("frac"), NULL, NULL, g_vdef_test_frac},
 	{FN("framerate"), NULL, NULL, g_vdef_test_framerate},
+	{FN("json"), NULL, NULL, g_vdef_test_json},
 	{FN("resolution"), NULL, NULL, g_vdef_test_resolution},
+	{FN("utils"), NULL, NULL, g_vdef_test_utils},
 
 	CU_SUITE_INFO_NULL,
 };

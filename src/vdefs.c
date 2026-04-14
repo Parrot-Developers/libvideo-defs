@@ -30,11 +30,11 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include <video-defs/vdefs.h>
+
 #define ULOG_TAG vdef
 #include <ulog.h>
 ULOG_DECLARE_TAG(ULOG_TAG);
-
-#include <video-defs/vdefs.h>
 
 
 #define VDEF_ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
@@ -191,6 +191,8 @@ bool vdef_is_raw_format_valid(const struct vdef_raw_format *format)
 bool vdef_raw_format_cmp(const struct vdef_raw_format *f1,
 			 const struct vdef_raw_format *f2)
 {
+	if (!f1 && !f2)
+		return true;
 	if (!f1 || !f2)
 		return false;
 	return f1->pix_format == f2->pix_format &&
@@ -279,6 +281,8 @@ bool vdef_is_coded_format_valid(const struct vdef_coded_format *format)
 bool vdef_coded_format_cmp(const struct vdef_coded_format *f1,
 			   const struct vdef_coded_format *f2)
 {
+	if (!f1 && !f2)
+		return true;
 	if (!f1 || !f2)
 		return false;
 	return f1->encoding == f2->encoding &&
@@ -304,6 +308,10 @@ bool vdef_coded_format_intersect(const struct vdef_coded_format *format,
 
 enum vdef_frame_type vdef_frame_type_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null frame type", __func__);
+		return VDEF_FRAME_TYPE_UNKNOWN;
+	}
 	if (strcasecmp(str, "RAW") == 0) {
 		return VDEF_FRAME_TYPE_RAW;
 	} else if (strcasecmp(str, "CODED") == 0) {
@@ -583,7 +591,9 @@ static const struct {
 int vdef_raw_format_from_str(const char *str, struct vdef_raw_format *format)
 {
 	const char *delim = "/";
-	char *s, *tok, *p;
+	char *s;
+	const char *tok;
+	char *p;
 	int ret = -EINVAL;
 
 	if (!str || !format)
@@ -865,6 +875,10 @@ vdef_calc_raw_contiguous_frame_size(const struct vdef_raw_format *format,
 
 enum vdef_encoding vdef_encoding_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null encoding", __func__);
+		return VDEF_ENCODING_UNKNOWN;
+	}
 	if ((strcasecmp(str, "JPEG") == 0) || (strcasecmp(str, "MJPEG") == 0)) {
 		return VDEF_ENCODING_JPEG;
 	} else if (strcasecmp(str, "PNG") == 0) {
@@ -920,6 +934,10 @@ const char *vdef_get_encoding_mime_type(enum vdef_encoding encoding)
 
 enum vdef_coded_data_format vdef_coded_data_format_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null coded format", __func__);
+		return VDEF_CODED_DATA_FORMAT_UNKNOWN;
+	}
 	if (strcasecmp(str, "JFIF") == 0) {
 		return VDEF_CODED_DATA_FORMAT_JFIF;
 	} else if (strcasecmp(str, "RAW_NALU") == 0) {
@@ -974,7 +992,9 @@ int vdef_coded_format_from_str(const char *str,
 			       struct vdef_coded_format *format)
 {
 	const char *delim = "/";
-	char *s, *tok, *p;
+	char *s;
+	const char *tok;
+	char *p;
 	int ret = -EINVAL;
 
 	if (!str || !format)
@@ -1041,6 +1061,10 @@ char *vdef_coded_format_to_str(const struct vdef_coded_format *format)
 
 enum vdef_coded_frame_type vdef_coded_frame_type_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null coded frame type", __func__);
+		return VDEF_CODED_FRAME_TYPE_UNKNOWN;
+	}
 	if (strcasecmp(str, "NOT_CODED") == 0) {
 		return VDEF_CODED_FRAME_TYPE_NOT_CODED;
 	} else if ((strcasecmp(str, "IDR") == 0) ||
@@ -1176,6 +1200,10 @@ uint32_t vdef_color_primaries_to_h265(enum vdef_color_primaries color)
 
 enum vdef_color_primaries vdef_color_primaries_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null color primaries", __func__);
+		return VDEF_COLOR_PRIMARIES_UNKNOWN;
+	}
 	if (strcasecmp(str, "BT601_525") == 0) {
 		return VDEF_COLOR_PRIMARIES_BT601_525;
 	} else if (strcasecmp(str, "BT601_625") == 0) {
@@ -1305,6 +1333,10 @@ vdef_color_primaries_from_values(const struct vdef_color_primaries_value *val)
 {
 	/* Round to a precision of 10^-3 for color primaries
 	 * and 10^-4 for white point */
+	if (val == NULL) {
+		ULOGW("%s: null color primaries values", __func__);
+		return VDEF_COLOR_PRIMARIES_UNKNOWN;
+	}
 	for (size_t i = 0; i < VDEF_COLOR_PRIMARIES_MAX; i++) {
 		if ((roundf(val->color_primaries[0].x * 1000.f) / 1000.f ==
 		     vdef_color_primaries_values[i].color_primaries[0].x) &&
@@ -1422,6 +1454,10 @@ uint32_t vdef_transfer_function_to_h265(enum vdef_transfer_function transfer)
 
 enum vdef_transfer_function vdef_transfer_function_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null transfer function", __func__);
+		return VDEF_TRANSFER_FUNCTION_UNKNOWN;
+	}
 	if (strcasecmp(str, "BT601") == 0) {
 		return VDEF_TRANSFER_FUNCTION_BT601;
 	} else if (strcasecmp(str, "BT709") == 0) {
@@ -1554,6 +1590,10 @@ uint32_t vdef_matrix_coefs_to_h265(enum vdef_matrix_coefs matrix)
 
 enum vdef_matrix_coefs vdef_matrix_coefs_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null matrix coefs", __func__);
+		return VDEF_MATRIX_COEFS_UNKNOWN;
+	}
 	if ((strcasecmp(str, "IDENTITY") == 0) ||
 	    (strcasecmp(str, "SRGB") == 0)) {
 		return VDEF_MATRIX_COEFS_IDENTITY;
@@ -1600,6 +1640,10 @@ const char *vdef_matrix_coefs_to_str(enum vdef_matrix_coefs matrix)
 
 enum vdef_dynamic_range vdef_dynamic_range_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null dynamic range", __func__);
+		return VDEF_DYNAMIC_RANGE_UNKNOWN;
+	}
 	if (strcasecmp(str, "SDR") == 0) {
 		return VDEF_DYNAMIC_RANGE_SDR;
 	} else if (strcasecmp(str, "HDR8") == 0) {
@@ -1632,6 +1676,10 @@ const char *vdef_dynamic_range_to_str(enum vdef_dynamic_range range)
 
 enum vdef_tone_mapping vdef_tone_mapping_from_str(const char *str)
 {
+	if (str == NULL) {
+		ULOGW("%s: null tone mapping", __func__);
+		return VDEF_TONE_MAPPING_UNKNOWN;
+	}
 	if (strcasecmp(str, "STANDARD") == 0) {
 		return VDEF_TONE_MAPPING_STANDARD;
 	} else if (strcasecmp(str, "P_LOG") == 0) {
@@ -1764,6 +1812,7 @@ struct {
 	MAKE_RESOLUTION_PRESET_MPX(12, 4000, 3000),
 	MAKE_RESOLUTION_PRESET_MPX(21, 5344, 4016),
 	MAKE_RESOLUTION_PRESET_MPX(48, 8000, 6000),
+	MAKE_RESOLUTION_PRESET_MPX(50, 8192, 6144),
 
 	/**
 	 * Special resolutions
@@ -1783,6 +1832,7 @@ struct {
 	MAKE_RESOLUTION(864, 480),
 	MAKE_RESOLUTION(432, 240),
 	MAKE_RESOLUTION(640, 512),
+	MAKE_RESOLUTION(17, 52),
 };
 
 
@@ -1903,7 +1953,10 @@ struct {
 	 */
 	MAKE_FRAMERATE(60, 7),
 	MAKE_FRAMERATE(60, 8),
+	MAKE_FRAMERATE(15, 1),
 	MAKE_FRAMERATE(30, 1),
+	MAKE_FRAMERATE(1, 1),
+	MAKE_FRAMERATE(1000, 1001),
 };
 
 
@@ -1964,20 +2017,6 @@ int vdef_framerate_to_frac(enum vdef_framerate rate, struct vdef_frac *frac)
 	}
 
 	return -ENOENT;
-}
-
-
-bool vdef_rect_fit(const struct vdef_rect *rect, const struct vdef_rect *bounds)
-{
-	if (!rect || !bounds || bounds->left < 0 || bounds->top < 0 ||
-	    (rect->left >= 0 && rect->left < bounds->left &&
-	     rect->left + rect->width > bounds->left + bounds->width) ||
-	    (rect->left < 0 && rect->width > bounds->width) ||
-	    (rect->top >= 0 && rect->top < bounds->top &&
-	     rect->top + rect->height > bounds->top + bounds->height) ||
-	    (rect->top < 0 && rect->height > bounds->height))
-		return false;
-	return true;
 }
 
 
@@ -2101,7 +2140,12 @@ out:
 
 int vdef_raw_format_from_csv(const char *str, struct vdef_raw_format *format)
 {
-	char *str2, *param, *key, *val, *temp, *p;
+	char *str2;
+	const char *param;
+	const char *key;
+	const char *val;
+	char *temp;
+	char *p;
 
 	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
 	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
@@ -2166,7 +2210,12 @@ out:
 int vdef_coded_format_from_csv(const char *str,
 			       struct vdef_coded_format *format)
 {
-	char *str2, *param, *key, *val, *temp, *p;
+	char *str2;
+	const char *param;
+	const char *key;
+	const char *val;
+	char *temp;
+	char *p;
 
 	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
 	ULOG_ERRNO_RETURN_ERR_IF(format == NULL, EINVAL);
@@ -2243,7 +2292,12 @@ int vdef_format_info_to_csv(const struct vdef_format_info *info, char **str)
 
 int vdef_format_info_from_csv(const char *str, struct vdef_format_info *info)
 {
-	char *str2, *param, *key, *val, *temp, *p;
+	char *str2;
+	const char *param;
+	const char *key;
+	const char *val;
+	char *temp;
+	char *p;
 
 	ULOG_ERRNO_RETURN_ERR_IF(str == NULL, EINVAL);
 	ULOG_ERRNO_RETURN_ERR_IF(info == NULL, EINVAL);

@@ -46,24 +46,6 @@ static void vdef_json_add_dim(struct json_object *jobj,
 }
 
 
-static void vdef_json_add_rect(struct json_object *jobj,
-			       const char *name,
-			       const struct vdef_rect *val)
-{
-	struct json_object *jobj_val = json_object_new_object();
-
-	json_object_object_add(
-		jobj_val, "left", json_object_new_int(val->left));
-	json_object_object_add(jobj_val, "top", json_object_new_int(val->top));
-	json_object_object_add(
-		jobj_val, "width", json_object_new_int(val->width));
-	json_object_object_add(
-		jobj_val, "height", json_object_new_int(val->height));
-
-	json_object_object_add(jobj, name, jobj_val);
-}
-
-
 static void vdef_json_add_frac(struct json_object *jobj,
 			       const char *name,
 			       const struct vdef_frac *val)

@@ -83,7 +83,7 @@ struct test_case {
 };
 
 static void run_single_test(const struct vdef_raw_format *fmt,
-			    struct single_test *st)
+			    const struct single_test *st)
 {
 	size_t pst[VDEF_RAW_MAX_PLANE_COUNT] = {0};
 	size_t psc[VDEF_RAW_MAX_PLANE_COUNT] = {0};
@@ -159,14 +159,14 @@ static void run_single_test(const struct vdef_raw_format *fmt,
 	}
 }
 
-static void run_test_case(struct test_case *t)
+static void run_test_case(const struct test_case *t)
 {
 	char *str = vdef_raw_format_to_str(t->fmt);
 	printf("Testing %s\n", str);
 	free(str);
 	int idx = 0;
-	struct single_test *st;
 	while (true) {
+		const struct single_test *st;
 		st = &t->tests[idx++];
 		if (st->res.width == 0)
 			break;
@@ -175,7 +175,7 @@ static void run_test_case(struct test_case *t)
 }
 
 static void run_test_contiguous(const struct vdef_raw_format *fmt,
-				struct single_test *st)
+				const struct single_test *st)
 {
 	size_t pst[VDEF_RAW_MAX_PLANE_COUNT] = {0};
 	size_t psc[VDEF_RAW_MAX_PLANE_COUNT] = {0};
@@ -1659,7 +1659,7 @@ struct test_case *all_tests[] = {
 static void test_calc_raw_frame_size(void)
 {
 	int idx = 0;
-	struct test_case *t;
+	const struct test_case *t;
 	while ((t = all_tests[idx++]) != NULL) {
 		run_test_case(t);
 	}
@@ -1672,7 +1672,7 @@ static void test_calc_raw_contiguous_frame_size(void)
 	printf("Testing %s\n", str);
 	free(str);
 	int idx = 0;
-	struct single_test *st;
+	const struct single_test *st;
 	while (true) {
 		st = &(i420.tests[idx++]);
 		if (st->res.width == 0)

@@ -84,6 +84,9 @@ static void test_resolution_to_str(void)
 
 	res = vdef_resolution_to_str(VDEF_RESOLUTION_48MPX);
 	CU_ASSERT_STRING_EQUAL(res, "48Mpx");
+
+	res = vdef_resolution_to_str(VDEF_RESOLUTION_50MPX);
+	CU_ASSERT_STRING_EQUAL(res, "50Mpx");
 }
 
 
@@ -137,6 +140,11 @@ static void test_resolution_from_dim(void)
 	dim.height = 6000;
 	res = vdef_resolution_from_dim(&dim);
 	CU_ASSERT_EQUAL(res, VDEF_RESOLUTION_48MPX);
+
+	dim.width = 8192;
+	dim.height = 6144;
+	res = vdef_resolution_from_dim(&dim);
+	CU_ASSERT_EQUAL(res, VDEF_RESOLUTION_50MPX);
 }
 
 

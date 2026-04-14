@@ -428,6 +428,9 @@ enum vdef_resolution {
 	/* 8000 x 6000 */
 	VDEF_RESOLUTION_48MPX,
 
+	/* 8192 x 6144 */
+	VDEF_RESOLUTION_50MPX,
+
 	/**
 	 * Special resolutions
 	 */
@@ -476,6 +479,9 @@ enum vdef_resolution {
 
 	/* 640 x 512 */
 	VDEF_RESOLUTION_640X512,
+
+	/* 17 x 52 */
+	VDEF_RESOLUTION_17X52,
 
 	/* Element count */
 	VDEF_RESOLUTION_MAX,
@@ -537,8 +543,17 @@ enum vdef_framerate {
 	/* 60/8 */
 	VDEF_FRAMERATE_60_8,
 
+	/* 15/1 */
+	VDEF_FRAMERATE_15_1,
+
 	/* 30/1 */
 	VDEF_FRAMERATE_30_1,
+
+	/* 1/1 */
+	VDEF_FRAMERATE_1_1,
+
+	/* 1000/1001 */
+	VDEF_FRAMERATE_1000_1001,
 
 	/* Element count */
 	VDEF_FRAMERATE_MAX,
@@ -1916,18 +1931,6 @@ static inline bool vdef_rect_cmp(const struct vdef_rect *r1,
 	return r1 && r2 && r1->left == r2->left && r1->top == r2->top &&
 	       r1->width == r2->width && r1->height == r2->height;
 }
-
-
-/**
- * Check if a rectangle fits in another rectangle.
- * The function checks if rect fits inside the rectangle bounds.
- * @param rect: the rectangle to check (the left and top can be set to -1, which
- *        means the rectangle is centered)
- * @param bound: the rectangle in which rect should fit
- * @return true if the rectangle fits inside the boundaries, false otherwise
- */
-VDEF_API bool vdef_rect_fit(const struct vdef_rect *rect,
-			    const struct vdef_rect *bounds);
 
 
 /**

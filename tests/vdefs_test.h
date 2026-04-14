@@ -34,6 +34,7 @@
 #include <CUnit/CUnit.h>
 
 #include <errno.h>
+#include <json-c/json.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +48,8 @@ extern CU_TestInfo g_vdef_test_calc[];
 extern CU_TestInfo g_vdef_test_csv[];
 extern CU_TestInfo g_vdef_test_frac[];
 extern CU_TestInfo g_vdef_test_framerate[];
+extern CU_TestInfo g_vdef_test_json[];
 extern CU_TestInfo g_vdef_test_resolution[];
-
+extern CU_TestInfo g_vdef_test_utils[];
 
 #endif /* _VDEFS_TEST_H_ */

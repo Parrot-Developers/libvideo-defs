@@ -36,6 +36,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := tst-libvideo-defs
 LOCAL_LIBRARIES := \
+	json \
 	libcunit\
 	libfutils \
 	libulog \
@@ -46,7 +47,9 @@ LOCAL_SRC_FILES := \
 	tests/vdefs_test_csv.c \
 	tests/vdefs_test_frac.c \
 	tests/vdefs_test_framerate.c \
+	tests/vdefs_test_json.c \
 	tests/vdefs_test_resolution.c \
+	tests/vdefs_test_utils.c \
 	tests/vdefs_test.c
 
 include $(BUILD_EXECUTABLE)
